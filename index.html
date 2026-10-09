@@ -372,12 +372,22 @@ const installments=salePay==="A prazo"?Array.from({length:installmentCount},(_,i
 if(installments.length){const diff=Math.round((total-installments.reduce((a,x)=>a+x.amount,0))*100)/100;if(diff)installments[installments.length-1].amount=Math.round((installments[installments.length-1].amount+diff)*100)/100;}
 const sale={id:Date.now(),code:db.nextSale++,date:new Date().toISOString(),customerId:customer?.id||null,customerName:customer?.name||"Venda sem cliente",items:saleCart.map(i=>({id:i.id,name:i.name,brand:i.brand,price:i.price,cost:Number(db.products.find(p=>p.id===i.id)?.cost||0),qty:i.qty})),subtotal,discount,total,payment:salePay,paid:salePay!=="A prazo",dueDate,installments};saleCart.forEach(i=>{db.products.find(p=>p.id===i.id).stock-=i.qty});db.sales.push(sale);saleCart=[];$("#discount").value=0;$("#saleCustomer").value="";salePay="À vista";document.querySelectorAll("[data-pay]").forEach(b=>b.classList.toggle("selected",b.dataset.pay==="À vista"));$("#dueDateWrap").classList.add("hidden");save();goto("dashboard");toast("Venda registrada com sucesso!")};
 $("#clearSale").onclick=()=>{saleCart=[];renderSaleCart();toast("Venda limpa")};
-$("#menuBtn").onclick=()=>goto("more");$("#notificationBtn").onclick=()=>toast("Você está em dia com o protótipo");$("#syncBtn").onclick=()=>toast("Para sincronizar entre vendedores, conectaremos um banco na nuvem");$("#settingsBtn").onclick=()=>openModal("Configurações",`<p style="font-size:11px;color:#c7b99e;line-height:1.7">Edite a mensagem usada ao clicar em “Enviar cobrança” no WhatsApp. Os campos entre chaves serão preenchidos automaticamente.</p><div class="form-group"><label>Mensagem padrão de cobrança</label><textarea id="chargeTemplate" class="form-control" rows="9" style="min-height:190px;line-height:1.6">${escapeHtml(getChargeTemplate())}</textarea></div><p style="font-size:10px;color:#b8a989;line-height:1.8">Campos disponíveis: <b>{NOME_DO_CLIENTE}</b>, <b>{VALOR_PENDENTE}</b>, <b>{NUMERO_DA_VENDA}</b>, <b>{PARCELA}</b> e <b>{VENCIMENTO}</b>.</p><button id="saveChargeTemplate" class="gold-button full">Salvar mensagem</button><button id="resetChargeTemplate" class="small-action" style="width:100%;padding:11px">Restaurar mensagem original</button>`);$("#saveChargeTemplate").onclick=()=>{const value=$("#chargeTemplate").value.trim();if(!value){toast("Digite uma mensagem antes de salvar");return}localStorage.setItem("ja_charge_template",value);closeModal();toast("Mensagem de cobrança salva")};$("#resetChargeTemplate").onclick=()=>{$("#chargeTemplate").value=DEFAULT_CHARGE_TEMPLATE;localStorage.removeItem("ja_charge_template");toast("Mensagem original restaurada")};$("#aboutBtn").onclick=()=>openModal("Sobre o aplicativo",`<p style="font-size:12px;color:#c7b99e;line-height:1.9">Jóia Árabe Perfumes<br>Aplicativo para controle de vendas.<br><br><b>Desenvolvido por:</b><br>Fladimir Galassi<br>Telefone: 67 99991-2265</p>`);
-$("#backupBtn").onclick=()=>{
- openModal("Backup e restauração",`<p style="font-size:12px;color:#c7b99e;line-height:1.7">Exporte seus produtos, clientes e vendas para um arquivo JSON. Guarde esse arquivo em local seguro.</p><button type="button" id="downloadBackupBtn" class="gold-button full">Baixar backup</button><div class="form-group" style="margin-top:16px"><label for="restoreFile">Selecionar arquivo de backup (.json)</label><input id="restoreFile" type="file" accept=".json,application/json" class="form-control"></div><button type="button" id="restoreBackupBtn" class="gold-button full">Restaurar backup selecionado</button><p style="font-size:10px;color:#ffcf78;line-height:1.6">A restauração substitui os dados atuais deste perfil. Faça um backup antes de restaurar.</p>`);
- $("#downloadBackupBtn").onclick=()=>{try{const payload={products:db.products||[],customers:db.customers||[],sales:db.sales||[],nextSale:Number(db.nextSale)||1001,exportedAt:new Date().toISOString(),app:"Joia Árabe Perfumes"};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="joia-arabe-backup-"+new Date().toISOString().slice(0,10)+".json";a.style.display="none";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast("Backup preparado para download")}catch(e){console.error(e);toast("Não foi possível criar o backup")}};
- $("#restoreBackupBtn").onclick=async()=>{const file=$("#restoreFile").files&&$("#restoreFile").files[0];if(!file){toast("Selecione primeiro um arquivo de backup .json");return}try{const data=JSON.parse(await file.text());if(!data||!Array.isArray(data.products)||!Array.isArray(data.customers)||!Array.isArray(data.sales))throw new Error("O arquivo não tem o formato de backup esperado");if(!confirm("Deseja substituir os dados deste perfil pelos dados do backup? Esta ação não pode ser desfeita."))return;db={products:data.products,customers:data.customers,sales:data.sales,nextSale:Number(data.nextSale)||1001};save();closeModal();renderAll();toast("Backup restaurado com sucesso")}catch(e){console.error(e);toast("Não foi possível restaurar. Confira se selecionou um backup válido do aplicativo.")}};
+$("#menuBtn").onclick=()=>goto("more");
+$("#notificationBtn").onclick=()=>toast("Você está em dia com o protótipo");
+$("#syncBtn").onclick=()=>toast("A sincronização entre aparelhos ainda depende da configuração do banco na nuvem.");
+$("#settingsBtn").onclick=()=>{
+  openModal("Configurações",`<p style="font-size:11px;color:#c7b99e;line-height:1.7">Edite a mensagem usada ao clicar em “Enviar cobrança” no WhatsApp. Os campos entre chaves serão preenchidos automaticamente.</p><div class="form-group"><label>Mensagem padrão de cobrança</label><textarea id="chargeTemplate" class="form-control" rows="9" style="min-height:190px;line-height:1.6">${escapeHtml(getChargeTemplate())}</textarea></div><p style="font-size:10px;color:#b8a989;line-height:1.8">Campos disponíveis: <b>{NOME_DO_CLIENTE}</b>, <b>{VALOR_PENDENTE}</b>, <b>{NUMERO_DA_VENDA}</b>, <b>{PARCELA}</b> e <b>{VENCIMENTO}</b>.</p><button id="saveChargeTemplate" type="button" class="gold-button full">Salvar mensagem</button><button id="resetChargeTemplate" type="button" class="small-action" style="width:100%;padding:11px">Restaurar mensagem original</button>`);
+  $("#saveChargeTemplate").onclick=()=>{const value=$("#chargeTemplate").value.trim();if(!value){toast("Digite uma mensagem antes de salvar");return}localStorage.setItem("ja_charge_template",value);closeModal();toast("Mensagem de cobrança salva")};
+  $("#resetChargeTemplate").onclick=()=>{$("#chargeTemplate").value=DEFAULT_CHARGE_TEMPLATE;localStorage.removeItem("ja_charge_template");toast("Mensagem original restaurada")};
 };
+$("#aboutBtn").onclick=()=>openModal("Sobre o aplicativo",`<div style="font-size:14px;color:#d8c7a5;line-height:2;text-align:center;padding:12px 4px"><strong style="font-size:18px;color:#e5c16b">JÓIA ÁRABE PERFUMES</strong><br>Aplicativo para controle de produtos, clientes e vendas.<hr style="border-color:#594626;margin:14px 0"><b>Desenvolvido por:</b><br>Fladimir Galassi<br><b>Telefone:</b> 67 99991-2265</div><button type="button" id="closeAboutAction" class="gold-button full">Fechar</button>`);
+$("#backupBtn").onclick=()=>{
+  const payloadNow=()=>({app:"Joia Árabe Perfumes",version:1,exportedAt:new Date().toISOString(),products:Array.isArray(db.products)?db.products:[],customers:Array.isArray(db.customers)?db.customers:[],sales:Array.isArray(db.sales)?db.sales:[],nextSale:Number(db.nextSale)||1001});
+  openModal("Backup e restauração",`<p style="font-size:12px;color:#c7b99e;line-height:1.7">Exporte produtos, clientes e vendas para um arquivo JSON. Guarde-o em local seguro.</p><button type="button" id="downloadBackupBtn" class="gold-button full">Baixar backup</button><div class="form-group" style="margin-top:16px"><label for="restoreFile">Selecionar arquivo de backup (.json)</label><input id="restoreFile" type="file" accept=".json,application/json" class="form-control"></div><button type="button" id="restoreBackupBtn" class="gold-button full">Restaurar backup selecionado</button><p style="font-size:10px;color:#ffcf78;line-height:1.6">A restauração substitui os dados deste perfil. Faça um backup antes de restaurar.</p>`);
+  $("#downloadBackupBtn").onclick=()=>{try{const blob=new Blob([JSON.stringify(payloadNow(),null,2)],{type:"application/json;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="joia-arabe-backup-"+new Date().toISOString().slice(0,10)+".json";a.style.display="none";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);toast("Backup gerado. Verifique a pasta Downloads.")}catch(err){console.error(err);alert("Não foi possível gerar o backup. Tente abrir o aplicativo no navegador.")}};
+  $("#restoreBackupBtn").onclick=async()=>{const file=$("#restoreFile").files?.[0];if(!file){alert("Selecione primeiro um arquivo JSON de backup.");return}try{const data=JSON.parse(await file.text());if(!data||!Array.isArray(data.products)||!Array.isArray(data.customers)||!Array.isArray(data.sales))throw new Error("Formato de backup inválido");if(!confirm("Deseja substituir os dados atuais deste perfil pelos dados do backup? Esta ação não pode ser desfeita."))return;db={products:data.products,customers:data.customers,sales:data.sales,nextSale:Number(data.nextSale)||1001};localStorage.setItem(dbKey(),JSON.stringify(db));renderAll();closeModal();toast("Backup restaurado com sucesso.")}catch(err){console.error(err);alert("Não foi possível restaurar. Selecione um backup JSON válido do Jóia Árabe Perfumes.")}};
+};
+$("#closeAboutAction")?.addEventListener("click",closeModal);
 $("#exportSales").onclick=()=>{const rows=[["Venda","Data","Cliente","Pagamento","Total","Status"],...db.sales.map(s=>[s.code,new Date(s.date).toLocaleString("pt-BR"),s.customerName,s.payment,s.total,s.paid?"Recebida":"Pendente"])];const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="vendas-joia-arabe.csv";a.click();URL.revokeObjectURL(a.href)};
 $("#filterProducts").onclick=()=>{currentCat="Todos";$("#productSearch").focus();toast("Use as categorias para filtrar")};
 
@@ -582,4 +592,69 @@ window.addEventListener('load',()=>{if(!appIsStandalone())setTimeout(renderInsta
 </script>
 
 <script>if("serviceWorker" in navigator && location.protocol.startsWith("http")){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(e=>console.warn("PWA",e)))}</script><script>document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('logoutBtn');if(b)b.onclick=async()=>{if(!confirm('Deseja realmente sair do aplicativo?'))return;try{if(window.firebaseAuthInstance&&window.firebaseSignOutFn)await window.firebaseSignOutFn(window.firebaseAuthInstance)}catch(e){console.warn(e)}try{localStorage.removeItem('ja_authenticated_email');localStorage.removeItem('ja_authenticated_mode');localStorage.removeItem('ja_session')}catch(e){}document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('username').value='';document.getElementById('password').value='';profileMode='owner';if(typeof toast==='function')toast('Você saiu do aplicativo')}});</script>
+<script>
+// Correções funcionais finais: Sobre, backup/restauração e sair.
+(()=>{
+ const $id=id=>document.getElementById(id);
+ const appLabel='Jóia Árabe Perfumes';
+ const currentDBKey=()=> (typeof profileMode!=='undefined' && profileMode==='demo')?'ja_demo_seller_db':'ja_seller_db';
+ const currentData=()=>{
+   let data={products:[],customers:[],sales:[],nextSale:1001};
+   try{const stored=JSON.parse(localStorage.getItem(currentDBKey())||'null');if(stored&&typeof stored==='object')data={...data,...stored}}catch(e){}
+   try{if(typeof db!=='undefined'&&db&&typeof db==='object')data={...data,...db}}catch(e){}
+   data.products=Array.isArray(data.products)?data.products:[];
+   data.customers=Array.isArray(data.customers)?data.customers:[];
+   data.sales=Array.isArray(data.sales)?data.sales:[];
+   data.nextSale=Number(data.nextSale)||1001;
+   return data;
+ };
+ const showModal=(title,html)=>{
+   const modal=$id('modal'),heading=$id('modalTitle'),body=$id('modalBody');
+   if(heading&&body&&modal){heading.textContent=title;body.innerHTML=html;modal.classList.remove('hidden');return true}
+   alert(title+'\n\n'+bodyText(html));return false;
+ };
+ const bodyText=html=>{const d=document.createElement('div');d.innerHTML=html;return d.textContent||''};
+ const downloadBackup=()=>{
+   const d=currentData();
+   const payload={app:appLabel,version:1,exportedAt:new Date().toISOString(),products:d.products,customers:d.customers,sales:d.sales,nextSale:d.nextSale};
+   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='joia-arabe-backup-'+new Date().toISOString().slice(0,10)+'.json';a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+   if(typeof toast==='function')toast('Backup gerado. Verifique a pasta Downloads.');
+ };
+ const openBackup=()=>{
+   showModal('Backup e restauração',`<p style="font-size:12px;color:#d3c5ac;line-height:1.7">Faça uma cópia dos produtos, clientes e vendas deste perfil. Guarde o arquivo JSON em local seguro.</p><button type="button" id="backupDownloadAction" class="gold-button full">Baixar backup</button><div class="form-group" style="margin-top:16px"><label for="backupRestoreInput">Selecionar arquivo de backup (.json)</label><input id="backupRestoreInput" type="file" accept=".json,application/json" class="form-control"></div><button type="button" id="backupRestoreAction" class="gold-button full">Restaurar backup selecionado</button><p style="font-size:10px;color:#ffcf78;line-height:1.6">A restauração substitui os dados atuais deste perfil.</p>`);
+   const dl=$id('backupDownloadAction');if(dl)dl.onclick=()=>{try{downloadBackup()}catch(e){console.error(e);alert('Não foi possível gerar o backup. Tente abrir o aplicativo no navegador e novamente.')}};
+   const restore=$id('backupRestoreAction');if(restore)restore.onclick=async()=>{
+     const file=$id('backupRestoreInput')?.files?.[0];if(!file){alert('Selecione primeiro um arquivo JSON de backup.');return}
+     try{const parsed=JSON.parse(await file.text());if(!parsed||!Array.isArray(parsed.products)||!Array.isArray(parsed.customers)||!Array.isArray(parsed.sales))throw new Error('Formato incompatível');
+       if(!confirm('Deseja substituir os dados atuais deste perfil pelos dados do backup?'))return;
+       const restored={products:parsed.products,customers:parsed.customers,sales:parsed.sales,nextSale:Number(parsed.nextSale)||1001};
+       localStorage.setItem(currentDBKey(),JSON.stringify(restored));
+       try{if(typeof db!=='undefined')db=restored}catch(e){}
+       if(typeof renderAll==='function')renderAll();if(typeof closeModal==='function')closeModal();
+       alert('Backup restaurado. Confira os produtos, clientes e vendas.');
+     }catch(e){console.error(e);alert('Não foi possível restaurar. Use um arquivo JSON de backup válido do Jóia Árabe Perfumes.')}
+   };
+ };
+ const openAbout=()=>showModal('Sobre o aplicativo',`<div style="font-size:14px;color:#d8c7a5;line-height:2;text-align:center;padding:12px 4px"><strong style="font-size:18px;color:#e5c16b">JÓIA ÁRABE PERFUMES</strong><br>Aplicativo para controle de produtos, clientes e vendas.<hr style="border-color:#594626;margin:14px 0"><b>Desenvolvido por:</b><br>Fladimir Galassi<br><b>Telefone:</b> 67 99991-2265<br><button type="button" class="gold-button full" id="closeAboutAction" style="margin-top:16px">Fechar</button></div>`);
+ const logout=async()=>{
+   if(!confirm('Deseja realmente sair do aplicativo?'))return;
+   try{if(window.firebaseAuthInstance&&window.firebaseSignOutFn)await window.firebaseSignOutFn(window.firebaseAuthInstance)}catch(e){console.warn('Firebase signOut',e)}
+   try{['ja_authenticated_email','ja_authenticated_mode','ja_session'].forEach(k=>localStorage.removeItem(k))}catch(e){}
+   const app=$id('app'),login=$id('login');if(app)app.classList.add('hidden');if(login)login.classList.remove('hidden');
+   if($id('username'))$id('username').value='';if($id('password'))$id('password').value='';
+   try{profileMode='owner'}catch(e){};
+   if(typeof toast==='function')toast('Você saiu do aplicativo.');
+ };
+ // Use delegated click handling to survive screen/modal re-rendering and prevent other handlers from overriding actions.
+ document.addEventListener('click',e=>{
+   const target=e.target?.closest?.('#aboutBtn,#backupBtn,#logoutBtn,#closeAboutAction');if(!target)return;
+   if(target.id==='aboutBtn'){e.preventDefault();e.stopImmediatePropagation();openAbout()}
+   else if(target.id==='backupBtn'){e.preventDefault();e.stopImmediatePropagation();openBackup()}
+   else if(target.id==='logoutBtn'){e.preventDefault();e.stopImmediatePropagation();logout()}
+   else if(target.id==='closeAboutAction'){e.preventDefault();if(typeof closeModal==='function')closeModal();else $id('modal')?.classList.add('hidden')}
+ },true);
+})();
+</script>
+
 </body></html>
