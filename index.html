@@ -505,12 +505,12 @@ let deferredInstallPrompt=null;
 const appIsStandalone=()=>window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
 function renderInstallBanner(){
   if(appIsStandalone()) return;
+  // Mostrar a opção também no computador; a instalação automática depende do navegador.
   const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if(!mobile && !deferredInstallPrompt) return;
   let el=document.getElementById('installAppBanner');
   if(!el){el=document.createElement('div');el.id='installAppBanner';el.className='install-app-banner';document.body.appendChild(el)}
   const isApple=/iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const help=isApple?'No Safari: toque em Compartilhar e depois em “Adicionar à Tela de Início”.':'Se o botão Instalar não aparecer, abra o menu ⋮ do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.';
+  const help=isApple?'No Safari: toque em Compartilhar e depois em “Adicionar à Tela de Início”.':mobile?'Se o botão Instalar não aparecer, abra o menu ⋮ do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.':'Se o navegador permitir instalação, use o botão Instalar. Caso contrário, abra o menu do navegador e procure “Instalar página/aplicativo”.';
   el.innerHTML='<div style="flex:1;min-width:160px"><b>Instalar Jóia Árabe Perfumes</b><small class="install-help">'+help+'</small></div>'+(deferredInstallPrompt?'<button id="installAppNow">Instalar</button>':'')+'<button class="dismiss" id="installAppLater">Fechar</button>';
   const now=document.getElementById('installAppNow');
   if(now) now.onclick=async()=>{if(!deferredInstallPrompt)return;const promptEvent=deferredInstallPrompt;deferredInstallPrompt=null;promptEvent.prompt();try{await promptEvent.userChoice}catch(e){}if(!appIsStandalone())renderInstallBanner();else el.remove()};
@@ -518,7 +518,7 @@ function renderInstallBanner(){
 }
 window.addEventListener('beforeinstallprompt',(event)=>{event.preventDefault();deferredInstallPrompt=event;renderInstallBanner()});
 window.addEventListener('appinstalled',()=>{document.getElementById('installAppBanner')?.remove();showMessage('Aplicativo instalado')});
-window.addEventListener('load',()=>{if(!appIsStandalone()&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))setTimeout(renderInstallBanner,900)});
+window.addEventListener('load',()=>{if(!appIsStandalone())setTimeout(renderInstallBanner,900)});
 
 </script>
 
