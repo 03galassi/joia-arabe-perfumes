@@ -128,6 +128,95 @@ body{width:100%;max-width:100%;min-width:0;margin:0;overflow-x:clip}
   .quick-actions,.quick-grid,.action-grid{gap:4px}
 }
 </style>
+<style id="fx-effects">
+/* ===== EFEITOS — Jóia Árabe (camada aditiva, não altera a lógica do app) ===== */
+@keyframes fxRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fxFade{from{opacity:0}to{opacity:1}}
+@keyframes fxSheet{from{opacity:0;transform:translateY(42px)}to{opacity:1;transform:none}}
+@keyframes fxGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes fxRipple{to{transform:scale(1);opacity:0}}
+@keyframes fxSheen{0%{transform:translateX(-160%) skewX(-20deg)}28%,100%{transform:translateX(360%) skewX(-20deg)}}
+@keyframes fxSweep{0%{transform:translateX(-120%) skewX(-18deg)}38%,100%{transform:translateX(330%) skewX(-18deg)}}
+@keyframes fxText{from{background-position:120% 0}to{background-position:-120% 0}}
+@keyframes fxGlow{0%,100%{text-shadow:0 0 22px #d8a73b55}50%{text-shadow:0 0 44px #f0bf52aa,0 0 8px #ffda7966}}
+@keyframes fxPing{0%{box-shadow:0 0 0 0 rgba(231,76,60,.65)}80%,100%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}
+@keyframes fxPop{0%{transform:scale(.88)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes fxFlash{0%{box-shadow:0 0 0 0 rgba(240,191,82,.55);border-color:#f0bf52}100%{box-shadow:0 0 0 16px rgba(240,191,82,0);border-color:#392d19}}
+@keyframes fxThumb{0%{transform:translateX(-160%) skewX(-20deg)}22%,100%{transform:translateX(320%) skewX(-20deg)}}
+
+/* Login: abertura orquestrada + brilho dourado no nome */
+.fx-motes{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.login-logo{animation:fxRise .9s cubic-bezier(.2,.8,.2,1) both}
+.login-form>*{animation:fxRise .7s cubic-bezier(.2,.8,.2,1) both}
+.login-form>*:nth-child(1){animation-delay:.25s}
+.login-form>*:nth-child(2){animation-delay:.35s}
+.login-form>*:nth-child(3){animation-delay:.45s}
+.login-form>*:nth-child(4){animation-delay:.52s}
+.login-form>*:nth-child(5){animation-delay:.6s}
+.login-form>*:nth-child(6){animation-delay:.68s}
+.logo-symbol{animation:fxGlow 4.5s ease-in-out infinite}
+.logo-name{background:linear-gradient(100deg,#f0bf52 0%,#f0bf52 38%,#fff6d8 50%,#f0bf52 62%,#f0bf52 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:fxText 6s linear infinite}
+
+/* Botões dourados: brilho que passa de tempos em tempos */
+.gold-button{position:relative;overflow:hidden}
+.gold-button::after{content:"";position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-160%) skewX(-20deg);animation:fxSheen 4.5s ease-in-out 1.5s infinite;pointer-events:none}
+
+/* Feedback de toque */
+.quick,.small-action,.pay,.chip,.round-add,.choice-row button,.qty button,.settings-list button{position:relative;overflow:hidden}
+.quick,.gold-button,.small-action,.pay,.chip,.round-add,.qty button,.choice-row button,.icon-button{transition:transform .14s ease,filter .14s ease}
+.quick:active,.gold-button:active,.small-action:active,.pay:active,.chip:active,.qty button:active,.choice-row button:active{transform:scale(.96)}
+.round-add:active{transform:rotate(90deg) scale(.92)}
+.icon-button:active{transform:scale(.88)}
+.fx-ripple{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,240,200,.55),rgba(255,226,154,0) 66%);transform:scale(0);animation:fxRipple .6s ease-out forwards}
+.pay.selected,.chip.selected{animation:fxPop .38s cubic-bezier(.3,1.6,.5,1)}
+
+/* Entrada das telas (só quando a aba muda, não a cada busca/digitação) */
+.page.fx-enter :is(.welcome,.metric,.quick,.section-title,.product-row,.choice-row,.sale-record,.customer-row,.sale-line,.field-card,.receivable-highlight,.bar-row,.profile-card,.settings-list,.chips,.search){animation:fxRise .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 45ms)}
+.bar i{transform-origin:left}
+.page.fx-enter .bar i{animation:fxGrow 1s cubic-bezier(.2,.8,.2,1) .25s both}
+
+/* Banner de boas-vindas: luz dourada passando devagar */
+.welcome{position:relative;overflow:hidden}
+.welcome::after{content:"";position:absolute;top:-10%;bottom:-10%;left:0;width:45%;background:linear-gradient(100deg,transparent,rgba(255,226,154,.17),transparent);transform:translateX(-120%) skewX(-18deg);animation:fxSweep 8s ease-in-out 1.4s infinite;pointer-events:none}
+
+/* Frascos: reflexo de vidro, defasado entre os itens */
+.perfume-thumb::after{content:"";position:absolute;top:0;bottom:0;left:0;width:36%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-160%) skewX(-20deg);animation:fxThumb 7s ease-in-out infinite;pointer-events:none}
+.product-list>*:nth-child(3n+2) .perfume-thumb::after,.choice-list>*:nth-child(3n+2) .perfume-thumb::after{animation-delay:-2.3s}
+.product-list>*:nth-child(3n) .perfume-thumb::after,.choice-list>*:nth-child(3n) .perfume-thumb::after{animation-delay:-4.6s}
+
+/* Navegação inferior: indicador dourado e ícone que salta */
+.nav{position:relative}
+.nav span{transition:transform .3s cubic-bezier(.3,1.6,.5,1),filter .3s}
+.nav::after{content:"";position:absolute;top:-8px;left:50%;width:24px;height:2px;border-radius:2px;background:var(--gold2);box-shadow:0 0 10px var(--gold);transform:translateX(-50%) scaleX(0);transition:transform .3s ease}
+.nav.active::after{transform:translateX(-50%) scaleX(1)}
+.nav.active span{transform:translateY(-2px) scale(1.14);filter:drop-shadow(0 0 6px rgba(240,191,82,.55))}
+.nav:active span{transform:scale(.86)}
+
+/* Sino, modal, toast */
+.notification i{animation:fxPing 2.2s infinite}
+.modal:not(.hidden){animation:fxFade .22s ease both}
+.modal-card{animation:fxSheet .42s cubic-bezier(.2,.9,.25,1) both}
+.toast{transition:opacity .25s ease,transform .45s cubic-bezier(.3,1.6,.5,1),box-shadow .3s ease}
+.toast.show{box-shadow:0 10px 34px #f0bf5255}
+
+/* Total da venda reage ao adicionar item */
+.fx-flash{animation:fxFlash .7s ease-out}
+
+/* Desktop: leve elevação ao passar o mouse */
+@media(hover:hover){
+  .quick:hover{transform:translateY(-2px);filter:brightness(1.08)}
+  .product-row,.sale-record,.customer-row{transition:border-color .2s ease,transform .2s ease}
+  .product-row:hover,.sale-record:hover{border-color:#6b511f;transform:translateY(-1px)}
+}
+
+/* Confete */
+.fx-confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+
+/* Respeita quem prefere menos movimento */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
 </head>
 <body>
 <div id="login" class="login-screen">
@@ -657,4 +746,178 @@ window.addEventListener('load',()=>{if(!appIsStandalone())setTimeout(renderInsta
 })();
 </script>
 
+<script id="fx-effects-js">
+/* ===== EFEITOS — Jóia Árabe (camada aditiva) ===== */
+(function(){
+"use strict";
+var RM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+var $=function(s){return document.querySelector(s)};
+var GOLD=["#f0bf52","#ffda79","#fff1c2","#d8a03c","#c48d2c"];
+
+/* 1. Ondulação dourada ao tocar nos botões */
+var RIPPLE=".gold-button,.quick,.small-action,.pay,.chip,.round-add,.choice-row button,.qty button,.settings-list button";
+document.addEventListener("pointerdown",function(e){
+  if(RM||!e.target.closest)return;
+  var b=e.target.closest(RIPPLE);if(!b)return;
+  var r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,s=document.createElement("span");
+  s.className="fx-ripple";
+  s.style.cssText="width:"+d+"px;height:"+d+"px;left:"+(e.clientX-r.left-d/2)+"px;top:"+(e.clientY-r.top-d/2)+"px";
+  b.appendChild(s);setTimeout(function(){s.remove()},650);
+},{passive:true});
+
+/* 2. Números que contam até o valor */
+var IDS=["todaySales","monthSales","receivableTotal","lowStock","reportRevenue","reportCost","reportProfit","reportCount","reportAverage","reportDue"];
+var NUM=/(\d[\d.]*)(,\d+)?/;
+function parse(t){
+  var m=NUM.exec(t);if(!m)return null;
+  var dec=m[2]?m[2].length-1:0;
+  return{pre:t.slice(0,m.index),suf:t.slice(m.index+m[0].length),dec:dec,v:parseFloat(m[1].replace(/\./g,"")+(m[2]?"."+m[2].slice(1):""))};
+}
+function write(el,t){el.__fxW=t;el.textContent=t}
+function run(el,from){
+  var p=parse(el.__fxT);if(!p)return;
+  cancelAnimationFrame(el.__fxR);
+  var t0=performance.now(),D=800;
+  (function step(now){
+    var k=Math.min(1,((now||performance.now())-t0)/D),e=1-Math.pow(1-k,4),v=from+(p.v-from)*e;
+    el.__fxCur=k>=1?p.v:v;
+    write(el,k>=1?el.__fxT:p.pre+v.toLocaleString("pt-BR",{minimumFractionDigits:p.dec,maximumFractionDigits:p.dec})+p.suf);
+    if(k<1)el.__fxR=requestAnimationFrame(step);
+  })(t0);
+}
+function onChange(el){
+  var t=el.textContent;if(t===el.__fxW)return;
+  el.__fxT=t;var p=parse(t);
+  if(!p||RM){el.__fxCur=p?p.v:0;return}
+  var from=el.__fxCur==null?0:el.__fxCur;
+  if(from===p.v){el.__fxW=t;return}
+  run(el,from);
+}
+function countUp(pg){
+  if(RM)return;
+  IDS.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el&&pg.contains(el)){el.__fxT=el.__fxT||el.textContent;if(parse(el.__fxT))run(el,0)}
+  });
+}
+IDS.forEach(function(id){
+  var el=document.getElementById(id);if(!el)return;
+  new MutationObserver(function(){onChange(el)}).observe(el,{childList:true,characterData:true,subtree:true});
+});
+
+/* 3. Entrada escalonada ao trocar de tela */
+var SEL=".welcome,.metric,.quick,.section-title,.product-row,.choice-row,.sale-record,.customer-row,.sale-line,.field-card,.receivable-highlight,.bar-row,.profile-card,.settings-list,.chips,.search";
+function enter(pg){
+  if(RM||!pg)return;
+  var i=0;
+  pg.querySelectorAll(SEL).forEach(function(el){el.style.setProperty("--i",Math.min(i++,11))});
+  pg.classList.remove("fx-enter");void pg.offsetWidth;pg.classList.add("fx-enter");
+  clearTimeout(pg.__fxT2);pg.__fxT2=setTimeout(function(){pg.classList.remove("fx-enter")},1200);
+  countUp(pg);
+}
+var pageObs=new MutationObserver(function(ms){
+  ms.forEach(function(m){
+    var t=m.target;
+    if(t.classList.contains("active")&&(m.oldValue||"").split(" ").indexOf("active")<0)enter(t);
+  });
+});
+document.querySelectorAll(".page").forEach(function(p){
+  pageObs.observe(p,{attributes:true,attributeFilter:["class"],attributeOldValue:true});
+});
+var app=document.getElementById("app");
+if(app){
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){
+      if((m.oldValue||"").split(" ").indexOf("hidden")>=0&&!app.classList.contains("hidden"))enter($(".page.active"));
+    });
+  }).observe(app,{attributes:true,attributeFilter:["class"],attributeOldValue:true});
+}
+
+/* 4. Confete dourado (venda registrada) e fagulhas (salvo) */
+var cv,cx,parts=[],raf=0;
+function loop(){
+  var W=innerWidth,H=innerHeight;
+  cx.clearRect(0,0,W,H);
+  parts=parts.filter(function(p){return p.life>0&&p.y<H+30});
+  parts.forEach(function(p){
+    p.vy+=.2;p.vx*=.992;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life-=.007;
+    cx.save();cx.globalAlpha=Math.max(0,Math.min(1,p.life*1.6));cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;
+    if(p.d){cx.beginPath();cx.moveTo(0,-p.w);cx.lineTo(p.w*.7,0);cx.lineTo(0,p.w);cx.lineTo(-p.w*.7,0);cx.closePath();cx.fill()}
+    else cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    cx.restore();
+  });
+  if(parts.length)raf=requestAnimationFrame(loop);
+  else{raf=0;cv.remove();cv=null}
+}
+function celebrate(big){
+  if(RM)return;
+  var W=innerWidth,H=innerHeight,dpr=Math.min(window.devicePixelRatio||1,2);
+  if(!cv){
+    cv=document.createElement("canvas");cv.className="fx-confetti";
+    cv.width=W*dpr;cv.height=H*dpr;document.body.appendChild(cv);
+    cx=cv.getContext("2d");cx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  var n=big?90:26,ox=W/2,oy=big?H*.62:H-110;
+  for(var i=0;i<n;i++){
+    var a=-Math.PI/2+(Math.random()-.5)*(big?2.4:1.5),s=(big?10:6.5)*(.5+Math.random());
+    parts.push({x:ox,y:oy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,w:3+Math.random()*5,h:2+Math.random()*4,c:GOLD[i%GOLD.length],d:Math.random()<.35,life:1});
+  }
+  if(!raf)raf=requestAnimationFrame(loop);
+}
+var toastEl=document.getElementById("toast");
+if(toastEl){
+  new MutationObserver(function(){
+    var t=toastEl.textContent||"";
+    if(/Venda registrada/.test(t))celebrate(true);
+    else if(/Recebimento registrado|\b(salvo|salva)\b/i.test(t))celebrate(false);
+  }).observe(toastEl,{childList:true,characterData:true,subtree:true});
+}
+
+/* 5. Total da venda pulsa ao adicionar/alterar item */
+document.addEventListener("click",function(e){
+  if(e.target.closest&&e.target.closest("[data-add-sale],[data-sale-qty]")){
+    var t=$(".sale-total");
+    if(t){t.classList.remove("fx-flash");void t.offsetWidth;t.classList.add("fx-flash")}
+  }
+},true);
+
+/* 6. Login: poeira dourada flutuando */
+var login=document.getElementById("login");
+if(login&&!RM){
+  var c=document.createElement("canvas");c.className="fx-motes";
+  login.insertBefore(c,login.children[1]||null);
+  var g=c.getContext("2d"),W=0,H=0,motes=[],running=false;
+  var size=function(){
+    var r=login.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+    if(!r.width)return false;
+    W=r.width;H=r.height;c.width=W*dpr;c.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);return true;
+  };
+  var spawn=function(first){
+    return{x:Math.random()*W,y:first?Math.random()*H:H+10,r:.6+Math.random()*1.8,vy:.12+Math.random()*.4,ph:Math.random()*6.28,c:GOLD[(Math.random()*GOLD.length)|0]};
+  };
+  var frame=function(t){
+    if(login.classList.contains("hidden")){running=false;return}
+    g.clearRect(0,0,W,H);
+    motes.forEach(function(m,i){
+      m.y-=m.vy;m.x+=Math.sin(t/1600+m.ph)*.18;
+      if(m.y<-12)motes[i]=m=spawn(false);
+      var a=.25+.55*Math.abs(Math.sin(t/900+m.ph));
+      g.globalAlpha=a*.25;g.fillStyle=m.c;g.beginPath();g.arc(m.x,m.y,m.r*3.2,0,6.283);g.fill();
+      g.globalAlpha=a;g.beginPath();g.arc(m.x,m.y,m.r,0,6.283);g.fill();
+    });
+    requestAnimationFrame(frame);
+  };
+  var start=function(){
+    if(running||!size())return;
+    running=true;
+    var n=Math.round(Math.min(56,Math.max(26,W/9)));
+    motes=[];for(var i=0;i<n;i++)motes.push(spawn(true));
+    requestAnimationFrame(frame);
+  };
+  start();
+  window.addEventListener("resize",function(){if(running)size()});
+  new MutationObserver(function(){if(!login.classList.contains("hidden"))start()}).observe(login,{attributes:true,attributeFilter:["class"]});
+}
+})();
+</script>
 </body></html>
