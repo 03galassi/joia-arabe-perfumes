@@ -74,7 +74,7 @@ main{padding:0 12px}.page{padding-top:11px}.welcome{border-radius:10px;min-heigh
 .login-form>label:not(.remember){background:rgba(0,0,0,.78);backdrop-filter:blur(3px)}
 
 
-html{width:100%;min-height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%;}body{width:100%;min-width:0;overflow-x:hidden;padding:0;margin:0}button,input,select,textarea{max-width:100%;touch-action:manipulation}.app-shell,.login-screen{width:100%;max-width:500px;min-width:0;margin-left:auto;margin-right:auto;overflow-x:hidden}.page,.field-card,.product-row,.sale-record,.customer-row,.modal-card{min-width:0;max-width:100%;overflow-wrap:anywhere}img{max-width:100%;height:auto}@media(max-width:430px){.app-shell,.login-screen{border-left:0;border-right:0}.bottom-nav{left:0;transform:none;width:100%}}.install-app-banner{position:fixed;left:12px;right:12px;bottom:76px;z-index:50;max-width:406px;margin:auto;background:#17130b;border:1px solid #d6a43d;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px #000b;color:#fff3d0;font-size:12px}.install-app-banner button{border:0;border-radius:7px;padding:9px;background:linear-gradient(110deg,#ffe49b,#e9a92e);font-weight:bold;color:#160f03}.install-app-banner .dismiss{background:transparent;color:#e9d7ae;border:1px solid #66501f}
+html{width:100%;min-height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%;}body{width:100%;min-width:0;overflow-x:hidden;padding:0;margin:0}button,input,select,textarea{max-width:100%;touch-action:manipulation}.app-shell,.login-screen{width:100%;max-width:500px;min-width:0;margin-left:auto;margin-right:auto}.page,.field-card,.product-row,.sale-record,.customer-row,.modal-card{min-width:0;max-width:100%;overflow-wrap:anywhere}img{max-width:100%;height:auto}.install-app-banner{position:fixed;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:100;max-width:none;margin:0;background:#17130b;border:1px solid #d6a43d;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px #000b;color:#fff3d0;font-size:12px}.install-app-banner button{border:0;border-radius:7px;padding:9px;background:linear-gradient(110deg,#ffe49b,#e9a92e);font-weight:bold;color:#160f03}.install-app-banner .dismiss{background:transparent;color:#e9d7ae;border:1px solid #66501f}.install-app-banner .install-help{display:block;font-size:11px;line-height:1.5;margin-top:5px;color:#d8c9aa}@media(max-width:600px){html,body{max-width:100%;overflow-x:hidden}.app-shell,.login-screen{width:100%;max-width:none;min-width:0;margin:0;border-left:0;border-right:0;box-shadow:none}.app-shell{padding-bottom:calc(83px + env(safe-area-inset-bottom))}.topbar{padding-left:12px;padding-right:12px}.header-brand{min-width:0;font-size:clamp(15px,4.3vw,20px);letter-spacing:.5px}.header-brand small{letter-spacing:2px}main{padding-left:12px;padding-right:12px}.bottom-nav{left:0;right:0;transform:none;width:100%;max-width:none}.page-title h1{font-size:clamp(20px,6vw,25px)}.product-row,.sale-record{width:100%;max-width:100%}.product-meta h3{overflow-wrap:anywhere}.product-side{max-width:45%}.install-app-banner{left:8px;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));flex-wrap:wrap}.install-app-banner button{white-space:nowrap}}@media(min-width:601px){.app-shell,.login-screen{margin-left:auto;margin-right:auto}}
 </style>
 </head>
 <body>
@@ -500,12 +500,25 @@ document.addEventListener("click", async (event) => {
   try { await signOut(auth); } catch (e) { console.warn(e); }
 }, true);
 
-// Instalação PWA: oferece o botão quando o navegador permitir instalar.
+// Instalação PWA: botão automático quando suportado e instruções nos demais navegadores.
 let deferredInstallPrompt=null;
-window.addEventListener("beforeinstallprompt",(event)=>{event.preventDefault();deferredInstallPrompt=event;showInstallBanner()});
-function showInstallBanner(){if(document.getElementById("installAppBanner")||!deferredInstallPrompt)return;const el=document.createElement("div");el.id="installAppBanner";el.className="install-app-banner";el.innerHTML='<div style="flex:1"><b>Instalar aplicativo</b><br><small>Adicione Jóia Árabe Perfumes à tela inicial.</small></div><button id="installAppNow">Instalar</button><button class="dismiss" id="installAppLater">Depois</button>';document.body.appendChild(el);document.getElementById("installAppNow").onclick=async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;el.remove()};document.getElementById("installAppLater").onclick=()=>el.remove()}
-window.addEventListener("appinstalled",()=>{document.getElementById("installAppBanner")?.remove();showMessage("Aplicativo instalado")});
-if(/Android|iPhone|iPad/i.test(navigator.userAgent)&&!window.matchMedia("(display-mode: standalone)").matches&&!deferredInstallPrompt){setTimeout(()=>{if(document.getElementById("installAppBanner"))return;const el=document.createElement("div");el.id="installAppBanner";el.className="install-app-banner";el.innerHTML='<div style="flex:1"><b>Instalar aplicativo</b><br><small>No menu do navegador, escolha “Adicionar à tela inicial”.</small></div><button class="dismiss" id="installAppLater">Fechar</button>';document.body.appendChild(el);document.getElementById("installAppLater").onclick=()=>el.remove()},1800)}
+const appIsStandalone=()=>window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+function renderInstallBanner(){
+  if(appIsStandalone()) return;
+  const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(!mobile && !deferredInstallPrompt) return;
+  let el=document.getElementById('installAppBanner');
+  if(!el){el=document.createElement('div');el.id='installAppBanner';el.className='install-app-banner';document.body.appendChild(el)}
+  const isApple=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const help=isApple?'No Safari: toque em Compartilhar e depois em “Adicionar à Tela de Início”.':'Se o botão Instalar não aparecer, abra o menu ⋮ do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.';
+  el.innerHTML='<div style="flex:1;min-width:160px"><b>Instalar Jóia Árabe Perfumes</b><small class="install-help">'+help+'</small></div>'+(deferredInstallPrompt?'<button id="installAppNow">Instalar</button>':'')+'<button class="dismiss" id="installAppLater">Fechar</button>';
+  const now=document.getElementById('installAppNow');
+  if(now) now.onclick=async()=>{if(!deferredInstallPrompt)return;const promptEvent=deferredInstallPrompt;deferredInstallPrompt=null;promptEvent.prompt();try{await promptEvent.userChoice}catch(e){}if(!appIsStandalone())renderInstallBanner();else el.remove()};
+  document.getElementById('installAppLater').onclick=()=>el.remove();
+}
+window.addEventListener('beforeinstallprompt',(event)=>{event.preventDefault();deferredInstallPrompt=event;renderInstallBanner()});
+window.addEventListener('appinstalled',()=>{document.getElementById('installAppBanner')?.remove();showMessage('Aplicativo instalado')});
+window.addEventListener('load',()=>{if(!appIsStandalone()&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))setTimeout(renderInstallBanner,900)});
 
 </script>
 
