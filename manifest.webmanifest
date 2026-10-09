@@ -1,0 +1,11 @@
+{
+  "name": "Jóia Árabe Perfumes",
+  "short_name": "Jóia Árabe",
+  "description": "Aplicativo de vendas e controle da Jóia Árabe Perfumes",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#030303",
+  "theme_color": "#080808",
+  "icons": []
+}
