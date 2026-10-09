@@ -98,6 +98,36 @@ img,svg,video,canvas{max-width:100%;height:auto}
 }
 
 </style>
+<style id="mobile-portrait-fit">
+/* Ajuste específico para telas estreitas em orientação vertical */
+*,*::before,*::after{box-sizing:border-box}
+html{width:100%;max-width:100%;min-width:0;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{width:100%;max-width:100%;min-width:0;margin:0;overflow-x:clip}
+@media screen and (max-width:600px){
+  html,body{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+  body{font-size:16px}
+  #app,.app-shell,.login-screen,.main-content,.content,.page,.screen{width:100%;min-width:0;max-width:100%;margin-left:0;margin-right:0}
+  .app-shell{padding-left:12px!important;padding-right:12px!important}
+  .topbar,header{max-width:100%;min-width:0}
+  main,.main-content,.content{padding-left:12px;padding-right:12px}
+  .dashboard-grid,.stats-grid,.metric-grid,.summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;min-width:0;gap:8px}
+  .dashboard-grid>*,.stats-grid>*,.metric-grid>*,.summary-grid>*{min-width:0;max-width:100%}
+  .quick-actions,.quick-grid,.action-grid{width:100%;min-width:0;grid-template-columns:repeat(6,minmax(0,1fr))}
+  .quick-actions>*,.quick-grid>*,.action-grid>*{min-width:0;overflow-wrap:anywhere}
+  input,select,textarea,button{max-width:100%;font-size:16px}
+  .card,.panel,.sale-record,.product-row,.customer-row,.modal,.modal-content{max-width:100%;min-width:0}
+  .modal,.modal-content{width:calc(100vw - 24px);max-height:85dvh;overflow-y:auto}
+  img,video,canvas,svg{max-width:100%}
+  .bottom-nav{left:0!important;right:0!important;width:100%!important;max-width:100%!important;transform:none!important}
+  .install-app-banner{left:10px!important;right:10px!important;width:auto!important;max-width:none!important}
+}
+@media screen and (max-width:360px){
+  .app-shell{padding-left:8px!important;padding-right:8px!important}
+  main,.main-content,.content{padding-left:8px;padding-right:8px}
+  .dashboard-grid,.stats-grid,.metric-grid,.summary-grid{gap:6px}
+  .quick-actions,.quick-grid,.action-grid{gap:4px}
+}
+</style>
 </head>
 <body>
 <div id="login" class="login-screen">
